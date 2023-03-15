@@ -2,7 +2,7 @@
 
 /*
  * Singleton - это паттерн проектирования в программировании,
- * который позволяет создавать только один экземпляр класса и предоставляет
+ * который позволяет создавать только один объект класса и предоставляет
  * глобальную точку доступа к этому экземпляру.
  */
 
@@ -17,10 +17,10 @@
  *  который предоставляет доступ к конфигурационным параметрам приложения.
  */
 
-final class Connection
+class Person
 {
-    private static ?self $instacne = null;
     private static string $name;
+    private static int $age;
 
     /**
      * @return string
@@ -37,27 +37,35 @@ final class Connection
     {
         self::$name = $name;
     }
-    public static function getInstance():self
+
+    /**
+     * @return int
+     */
+    public static function getAge(): int
     {
-        if(self::$instacne === null)
-        {
+        return self::$age;
+    }
+
+    /**
+     * @param int $age
+     */
+    public static function setAge(int $age): void
+    {
+        self::$age = $age;
+    }
+    private static ?self $instacne = null;
+
+    public static function getInstance(): self
+    {
+        if(self::$instacne == null){
             self::$instacne = new self();
         }
-            return self::$instacne;
-    }
-
-    public function __clone(): void
-    {
-        // TODO: Implement __clone() method.
-    }
-
-    public function __wakeup(): void
-    {
-        // TODO: Implement __wakeup() method.
+        return self::$instacne;
     }
 }
 
-$connection = Connection::getInstance();
-$connection::setName("Laravel");
+$person = Person::getInstance();
 
-var_dump($connection::getName());
+$person::setName("Ivan");
+$person::setAge(20);
+var_dump($person::getName(), $person::getAge());
