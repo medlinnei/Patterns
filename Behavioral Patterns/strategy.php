@@ -10,64 +10,50 @@
  * мы создаем отдельный класс для каждого алгоритма и передаем нужный класс объекту,
  * который будет выполнять сортировку.
  */
-interface Definer
+
+interface User
 {
-    public function define($arg): string;
+    public function oplata();
 }
 
-class Data
+class Contest
 {
-    private Definer $definer;
-    private int|string|bool $arg;
+    private User $user;
 
     /**
-     * @param bool|int|string $arg
+     * @param User $user
      */
-    public function setArg(bool|int|string $arg): void
+    public function __construct(User $user)
     {
-        $this->arg = $arg;
+        $this->user = $user;
     }
 
-    /**
-     * @param Definer $definer
-     */
-    public function __construct(Definer $definer)
+    public function infoPay()
     {
-        $this->definer = $definer;
+        $this->user->oplata();
     }
 
-    public function executeStrategy(): string
-    {
-       return $this->definer->define($this->arg);
-    }
+
 }
 
-class IntDefiner implements Definer
+class Card implements User
 {
 
-    public function define($arg): string
+    public function oplata()
     {
-        return $arg . " from int strategy";
+       echo "Опалата картою" . PHP_EOL;
     }
 }
 
-class StringDefiner implements  Definer
+class Nal implements User
 {
-    public function define($arg): string
+
+    public function oplata()
     {
-        return $arg . " from string strategy";
+        echo "Опалата налічкою" . PHP_EOL;
     }
 }
 
-class BooleanDefiner implements  Definer
-{
-    public function define($arg): string
-    {
-        return $arg . " from boolean strategy";
-    }
-}
+$oplata = new Contest(new Card());
 
-$data = new Data(new IntDefiner());
-$data->setArg("some arg for first");
-
-var_dump($data->executeStrategy());
+$oplata->infoPay();
