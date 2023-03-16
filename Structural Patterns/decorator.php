@@ -9,43 +9,59 @@
  * который содержит ссылку на исходный объект и добавляет новые методы или свойства.
  * Декоратор оборачивает исходный объект, добавляя новую функциональность или модифицируя его поведение.
  */
-interface Worker
+
+interface Window
 {
-    public function countSalary(): int;
+    public function open();
+    public function close();
+    public function display();
 }
 
-abstract class WorkerDecorator implements Worker
+class BasicWindow implements Window
 {
-    public Worker $worker;
-
-    /**
-     * @param Worker $worker
-     */
-    public function __construct(Worker $worker)
+    public function open()
     {
-        $this->worker = $worker;
+        echo "Window is opened\n";
+    }
+    public function close()
+    {
+        echo "Window is closed\n";
+    }
+    public function display()
+    {
+        echo "Window is displayed\n";
     }
 }
 
-class Developer implements Worker
+abstract class WindowDecorator implements Window
 {
+    protected $window;
 
-    public function countSalary(): int
+    public function __construct(Window $window)
     {
-        return 20 * 3000;
+        $this->window = $window;
+    }
+
+    public function open()
+    {
+        $this->window->open();
+    }
+
+    public function close()
+    {
+        $this->window->close();
+    }
+
+    public function display()
+    {
+        $this->window->display();
     }
 }
 
-class DeveloperOverTime extends WorkerDecorator
-{
-    public function countSalary(): int
-    {
-        return $this->worker->countSalary() + $this->worker->countSalary() * 0.2;
-    }
-}
+// Использование
 
-$developer = new Developer();
-$developerOverTime = new DeveloperOverTime($developer);
+$window = new BasicWindow();
 
-var_dump($developer->countSalary());
-var_dump($developerOverTime->countSalary());
+$window->open(); // "Window is opened"
+$window->display(); // "Window is displayed\nWindow can be dragged"
+$window->close(); // "Window is closed"
