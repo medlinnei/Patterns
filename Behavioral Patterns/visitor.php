@@ -10,71 +10,64 @@
  * визитора и вызывает соответствующую операцию. Важно,
  * что объекты могут быть разных классов, но должны иметь общий интерфейс принятия
  * визитора, чтобы визитор мог вызывать операции для каждого объекта.
+ *
+ * Є схема на https://refactoring.guru/ru/design-patterns/visitor
  */
-interface WorkerVisitor
+
+
+interface Visitor
 {
-    public function VisitDeveloper(Worker $worker);
-    public function VisitDesigner(Worker $worker);
+    public function ElementA(ConcreteElementA $concreteElementA);
+    public function ElementB(ConcreteElementB $concreteElementB);
 }
 
-class RecordedVisitor implements WorkerVisitor
+interface ElementVisitor
 {
-    private array $visited = [];
-
-    /**
-     * @return array
-     */
-    public function getVisited(): array
-    {
-        return $this->visited;
-    }
-    public function VisitDeveloper(Worker $developer)
-    {
-       $this->visited[] = $developer;
-    }
-
-    public function VisitDesigner(Worker $designer)
-    {
-        $this->visited[] = $designer;
-    }
+    public function accept(Visitor $visitor);
 }
 
-interface Worker
+class ConcreteVisitor implements Visitor
 {
-    public function work();
-    public function accept(WorkerVisitor $visitor);
-}
 
-class Developer implements Worker
-{
-    public function accept(WorkerVisitor $visitor)
+    public function ElementA(ConcreteElementA $concreteElementA)
     {
-        $visitor->VisitDeveloper($this);
+        $concreteElementA->futureA($this);
     }
-    public function work()
+
+    public function ElementB(ConcreteElementB $concreteElementB)
     {
-        printf("developer is working");
+        $concreteElementB->futureB($this);
     }
 }
 
-class Designer implements Worker
+class ConcreteElementA implements ElementVisitor
 {
-    public function accept(WorkerVisitor $visitor)
+    public function futureA(Visitor $visitor)
     {
-        $visitor->VisitDesigner($this);
+        echo "Visit Element A". PHP_EOL;
     }
-    public function work()
+
+    public function accept(Visitor $visitor)
     {
-        printf("designer is working");
+        $visitor->ElementA($this);
+    }
+}
+class ConcreteElementB implements ElementVisitor
+{
+
+    public function futureB(Visitor $visitor)
+    {
+        echo "Visit Element B". PHP_EOL;
+    }
+    public function accept(Visitor $visitor)
+    {
+        $visitor->ElementB($this);
     }
 }
 
-$visitor = new RecordedVisitor();
+$elementA = new ConcreteElementA();
+$elementB = new ConcreteElementB();
 
-$developer = new Developer();
-$designer = new Designer();
+$concreteVisitor = new ConcreteVisitor();
 
-$developer->accept($visitor);
-$designer->accept($visitor);
-
-var_dump($visitor->getVisited());
+$concreteVisitor->ElementA($elementA);
