@@ -10,97 +10,92 @@
  * Вместо того, чтобы включать проверки состояний в каждый метод объекта,
  * мы создаем отдельный класс для каждого состояния и делегируем выполнение методов этим классам.
  */
-interface State
+
+interface StateCRUD
 {
-    public function ToNext(Task $task);
-    public function GetStatus();
+    public function toNext(Task $task);
+    public function getStatus();
 }
 
 class Task
 {
-    private State $state;
+    public StateCRUD $stateCRUD;
 
     /**
-     * @return State
+     * @param StateCRUD $stateCRUD
      */
-    public function getState(): State
+    public function __construct(StateCRUD $stateCRUD)
     {
-        return $this->state;
+        $this->stateCRUD = $stateCRUD;
     }
 
-    /**
-     * @param State $state
-     */
-    public function setState(State $state): void
+    public function nextState()
     {
-        $this->state = $state;
+        $this->stateCRUD->toNext($this);
     }
 
-    public static function make()
+    public function getStatus()
     {
-        $self = new self();
-        $self->setState(new Created());
-        return $self;
+        $this->stateCRUD->getStatus();
     }
 
-    public function proceedToNext()
-    {
-        $this->state->ToNext($this);
-    }
+
 }
-
-class Created implements State
+class Created implements StateCRUD
 {
-    public function ToNext(Task $task)
+
+    public function toNext(Task $task)
     {
-        $task->setState(new Process());
+        $task->stateCRUD = new Read();
     }
 
-    public function GetStatus()
+    public function getStatus()
     {
-        return "Created";
+        echo "Created". PHP_EOL;
     }
 }
-
-class Process implements State
+class Read implements StateCRUD
 {
-    public function ToNext(Task $task)
+
+    public function toNext(Task $task)
     {
-        $task->setState(new Test());
+        $task->stateCRUD = new Update();
     }
 
-    public function GetStatus()
+    public function getStatus()
     {
-        return "Process";
+        echo "Read". PHP_EOL;
+
     }
 }
-
-class Test implements State
+class Update implements StateCRUD
 {
-    public function ToNext(Task $task)
+
+    public function toNext(Task $task)
     {
-        $task->setState(new Done());
+        $task->stateCRUD = new Delete();
     }
 
-    public function GetStatus()
+    public function getStatus()
     {
-        return "Test";
+        echo "Update". PHP_EOL;
     }
 }
-
-class Done implements State
+class Delete implements StateCRUD
 {
-    public function ToNext(Task $task)
+
+    public function toNext(Task $task)
     {
-        // TODO: Implement ToNext() method.
+        echo "Cannot transition from Delete" . PHP_EOL;
     }
 
-    public function GetStatus()
+    public function getStatus()
     {
-        return "Done";
+        echo "Delete". PHP_EOL;
     }
 }
 
-$task = Task::make();
-$task->proceedToNext();
-var_dump($task->getState()->GetStatus());
+$stateCRUD = new Task(new Created());
+$stateCRUD->nextState();
+$stateCRUD->nextState();
+$stateCRUD->getStatus();
