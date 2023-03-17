@@ -10,58 +10,68 @@
  * Декоратор оборачивает исходный объект, добавляя новую функциональность или модифицируя его поведение.
  */
 
-interface Window
+<?php
+
+// Загальний інтерфейс компонентів.
+interface DataSource
 {
-    public function open();
-    public function close();
-    public function display();
+    public function WriteData($data);
+    public function ReadData();
 }
 
-class BasicWindow implements Window
+// Один з конкретних компонентів реалізує базову
+// функціональність.
+class FileDataSource implements DataSource
 {
-    public function open()
+
+    public function WriteData($data)
     {
-        echo "Window is opened\n";
+        echo ("Запись данных");
     }
-    public function close()
+
+    public function ReadData()
     {
-        echo "Window is closed\n";
+        echo ("Прочитать данные из файла");
     }
-    public function display()
+}
+// Базовий клас усіх декораторів містить код обгортування.
+class DataSourceDecorator implements DataSource
+{
+    public DataSource $dataSource;
+
+    /**
+     * @param DataSource $dataSource
+     */
+    public function __construct(DataSource $dataSource)
     {
-        echo "Window is displayed\n";
+        $this->dataSource = $dataSource;
+    }
+
+    public function WriteData($data)
+    {
+        $this->dataSource->WriteData(13);
+    }
+
+    public function ReadData()
+    {
+        return $this->dataSource->ReadData();
     }
 }
 
-abstract class WindowDecorator implements Window
+// Конкретні декоратори додають щось своє до базової поведінки
+// обгорнутого компонента.
+class EncryptionDecorator implements DataSource
 {
-    protected $window;
-
-    public function __construct(Window $window)
+    public function WriteData($data)
     {
-        $this->window = $window;
+        echo "Зашифровать поданные данные";
     }
-
-    public function open()
+    public function ReadData()
     {
-        $this->window->open();
-    }
-
-    public function close()
-    {
-        $this->window->close();
-    }
-
-    public function display()
-    {
-        $this->window->display();
+        echo "Прочитать зашифрованные данные";
     }
 }
+//Створення Базових класів усіх декораторів в якій міститься клас який наслідується від інтерфейсу
+$dataSource = new DataSourceDecorator(new EncryptionDecorator());
+$dataSource->ReadData();
 
-// Использование
-
-$window = new BasicWindow();
-
-$window->open(); // "Window is opened"
-$window->display(); // "Window is displayed\nWindow can be dragged"
-$window->close(); // "Window is closed"
