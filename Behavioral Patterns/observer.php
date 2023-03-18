@@ -9,18 +9,24 @@
  * и наблюдатель (Observer), который получает уведомление о изменениях и может обновить свою информацию. Важно,
  * что объекты-наблюдатели могут добавляться и удаляться динамически во время работы программы.
  */
+
 class Worker implements SplSubject
 {
-    private SplObjectStorage $splObjectStorage;
+    public SplObjectStorage $splObjectStorage;
 
     /**
      * @param SplObjectStorage $splObjectStorage
      */
     public function __construct()
     {
-        $this->splObjectStorage = new SplObjectStorage();
+        $this->splObjectStorage = new splObjectStorage();
     }
 
+    public function changeName(string $name)
+    {
+        $this->name = $name;
+        $this->notify();
+    }
     public function attach(SplObserver $observer): void
     {
         $this->splObjectStorage->attach($observer);
@@ -30,23 +36,18 @@ class Worker implements SplSubject
     {
         $this->splObjectStorage->detach($observer);
     }
-    public function changeName($name)
-    {
-        $this->name = $name;
-        $this->notify();
-    }
 
     public function notify(): void
     {
-        foreach ($this->splObjectStorage as $splObjectStorage){
-            $splObjectStorage->update($this);
+        foreach ($this->splObjectStorage as $splObserver) {
+            $splObserver->update($this);
         }
     }
 }
 
-class WorkerObServer implements SplObserver
+class Observer implements SplObserver
 {
-    private array $workers = [];
+    public array $workers = [];
 
     /**
      * @return array
@@ -55,14 +56,15 @@ class WorkerObServer implements SplObserver
     {
         return $this->workers;
     }
+
     public function update(SplSubject $subject): void
     {
         $this->workers[] = clone $subject;
     }
 }
 
-$observer = new WorkerObServer();
 $worker = new Worker();
+$observer = new Observer();
 
 $worker->attach($observer);
 $worker->changeName("Ivan");
