@@ -9,88 +9,62 @@
  * который хранит состояние объекта; создатель (Originator), который создает и восстанавливает объекты из хранителя;
  * и смотритель (Caretaker), который управляет хранителем и создателем, чтобы сохранять и восстанавливать состояние объекта.
  */
-class Memento
-{
-    private State $state;
 
-    /**
-     * @return State
-     */
-    public function getState(): State
+
+// Создаем класс для объекта, состояние которого мы будем сохранять
+class Originator 
+{
+    private $state;
+
+    public function setState($state) 
+    {
+        $this->state = $state;
+    }
+
+    public function getState() 
     {
         return $this->state;
     }
 
-    /**
-     * @param State $state
-     */
-    public function __construct(State $state)
-    {
-        $this->state = $state;
-    }
-}
-
-class State
-{
-    public const CREATED = "created";
-    public const PROCESS = "process";
-    public const TEST = "test";
-    public const DONE = "done";
-
-    private string $state;
-
-    /**
-     * @param string $state
-     */
-    public function __construct(string $state)
-    {
-        $this->state = $state;
-    }
-
-    public function __toString(): string
-    {
-        return  $this->state;
-    }
-}
-
-class Task
-{
-    private State $state;
-
-    public function create()
-    {
-        $this->state = new State(State::CREATED);
-    }
-    public function process()
-    {
-        $this->state = new State(State::PROCESS);
-    }
-    public function test()
-    {
-        $this->state = new State(State::TEST);
-    }
-    public function done()
-    {
-        $this->state = new State(State::DONE);
-    }
-
-    public function saveToMemento(): Memento
+// Создаем объект-хранитель состояния и сохраняем текущее состояние объекта в него
+    public function save() 
     {
         return new Memento($this->state);
     }
-    public function restoreFromMemento(Memento $memento)
+
+// Восстанавливаем состояние объекта из объекта-хранителя
+    public function restore(Memento $memento) 
     {
         $this->state = $memento->getState();
     }
+}
 
-    public function getState(): State
+// Создаем класс для объекта-хранителя состояния
+class Memento 
+{
+    private $state;
+
+    public function __construct($state) 
+    {
+        $this->state = $state;  
+    }
+
+    public function getState() 
     {
         return $this->state;
     }
 }
 
-$task = new Task();
-$task->create();
+// Создаем объект Originator и сохраняем его текущее состояние
+$originator = new Originator();
+$originator->setState("Состояние 1");
+$memento = $originator->save();
 
-$memento = $task->saveToMemento();
-var_dump($memento->getState());
+// Изменяем состояние объекта Originator
+$originator->setState("Состояние 2");
+
+// Восстанавливаем состояние объекта Originator из объекта-хранителя
+$originator->restore($memento);
+
+// Теперь состояние объекта Originator равно "Состояние 1"
+echo $originator->getState();
