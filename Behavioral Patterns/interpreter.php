@@ -11,97 +11,91 @@
  * Он может принимать на вход данные в виде текстовой
  * строки или каких-то других форматов, а затем обрабатывать их с помощью разных правил и алгоритмов.
  */
-abstract class Expression
+<?php
+
+interface Inpreter
 {
-    abstract public function interpret(Context $context): bool;
+    public function interpret(): int;
 }
 
-class Context
+class Number implements Inpreter
 {
-    private array $workers = [];
-
-    public function setWorkers(string $workers): void
-    {
-        $this->workers[] = $workers;
-    }
-
-    public function lookUp($key): string|bool
-    {
-        if(isset($this->workers[$key])){
-            return $this->workers[$key];
-        }
-        return false;
-    }
-}
-
-class VariableExp extends Expression
-{
-    private int $key;
+    public int $number;
 
     /**
-     * @param int $key
+     * @param int $number
      */
-    public function __construct(int $key)
+    public function __construct(int $number)
     {
-        $this->key = $key;
+        $this->number = $number;
     }
 
-    public function interpret(Context $context): bool
+    public function interpret(): int
     {
-        return $context->lookUp($this->key);
+        return $this->number;
     }
 }
-
-class AndExp extends Expression
+class Plus implements Inpreter
 {
-    private int $keyOne;
-    private int $keyTwo;
+    public Inpreter $exp1;
+    public Inpreter $exp2;
 
     /**
-     * @param int $keyOne
-     * @param int $keyTwo
+     * @param Inpreter $exp1
+     * @param Inpreter $exp2
      */
-    public function __construct(int $keyOne, int $keyTwo)
+    public function __construct(Inpreter $exp1, Inpreter $exp2)
     {
-        $this->keyOne = $keyOne;
-        $this->keyTwo = $keyTwo;
+        $this->exp1 = $exp1;
+        $this->exp2 = $exp2;
     }
 
-    public function interpret(Context $context): bool
+    public function interpret(): int
     {
-        return $context->lookUp($this->keyOne) and $context->lookUp($this->keyOne);
+        return $this->exp1->interpret() + $this->exp2->interpret();
     }
 }
-
-class OrExp extends Expression
+class Minus implements Inpreter
 {
-    private int $keyOne;
-    private int $keyTwo;
+    public Inpreter $exp1;
+    public Inpreter $exp2;
 
     /**
-     * @param int $keyOne
-     * @param int $keyTwo
+     * @param Inpreter $exp1
+     * @param Inpreter $exp2
      */
-    public function __construct(int $keyOne, int $keyTwo)
+    public function __construct(Inpreter $exp1, Inpreter $exp2)
     {
-        $this->keyOne = $keyOne;
-        $this->keyTwo = $keyTwo;
+        $this->exp1 = $exp1;
+        $this->exp2 = $exp2;
     }
 
-    public function interpret(Context $context): bool
+    public function interpret(): int
     {
-        return $context->lookUp($this->keyOne) or $context->lookUp($this->keyOne);
+        return $this->exp1->interpret() - $this->exp2->interpret();
     }
 }
 
-$context = new Context();
-$context->setWorkers("Ivan");
-$context->setWorkers("Alex");
+class Multiply implements Inpreter
+{
+    public Inpreter $exp1;
+    public Inpreter $exp2;
 
-$varExp = new VariableExp(1);
-$andExp = new AndExp(2, 5);
-$orExp = new OrExp(1, 3);
+    /**
+     * @param Inpreter $exp1
+     * @param Inpreter $exp2
+     */
+    public function __construct(Inpreter $exp1, Inpreter $exp2)
+    {
+        $this->exp1 = $exp1;
+        $this->exp2 = $exp2;
+    }
 
-var_dump($varExp->interpret($context));
-var_dump($andExp->interpret($context));
-var_dump($orExp->interpret($context));
+    public function interpret(): int
+    {
+        return $this->exp1->interpret() * $this->exp2->interpret();
+    }
+}
+
+$expression = new Plus(new Number(10), new Multiply(new Number(2), new Number(10)));
+echo $expression->interpret();
