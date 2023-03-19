@@ -12,77 +12,96 @@
  * а только сообщают о своих действиях посреднику. Посредник же, в свою очередь,
  * реагирует на эти сообщения и управляет взаимодействием между объектами.
  */
+<?php
+
 interface Mediator
 {
-    public function getWorker();
+    public function getComponents();
 }
 
-abstract class Worker
+class ConcreteComponents
 {
-    private string $name;
+    private string $component3 = "Component 3";
 
     /**
-     * @param string $name
+     * @return string
      */
-    public function __construct(string $name)
+    public function getComponent3(): string
     {
-        $this->name = $name;
+        return $this->component3;
     }
 
-    public function seyHello()
-    {
-        printf("Hello");
-    }
-
-    public function work(): string
-    {
-        return $this->name. " is working";
-    }
 }
-
-class InfoBase
+class ComponentsConcreteMediator implements Mediator
 {
-    public function printInfo(Worker $worker)
-    {
-        printf($worker->work());
-    }
-}
-
-class WorkerInfoBaseMediator implements Mediator
-{
-    private Worker $worker;
-    private InfoBase $infoBase;
+    public ComponentOne $componentOne;
+    public ComponentTwo $componentTwo;
+    public ConcreteComponents $concreteComponents;
 
     /**
-     * @param Worker $worker
-     * @param InfoBase $infoBase
+     * @param ComponentOne $componentOne
+     * @param ComponentTwo $componentTwo
      */
-    public function __construct(Worker $worker, InfoBase $infoBase)
+    public function __construct(ComponentOne $componentOne, ComponentTwo $componentTwo, $concreteComponents)
     {
-        $this->worker = $worker;
-        $this->infoBase = $infoBase;
+        $this->concreteComponents = $concreteComponents;
+        $this->componentOne = $componentOne;
+        $this->componentTwo = $componentTwo;
+    }
+    public function getComponents()
+    {
+       echo $this->concreteComponents->getComponent3();
+       echo $this->componentOne->getComponent1();
+       echo $this->componentTwo->getComponent2();
     }
 
-    public function getWorker()
+}
+class ComponentOne extends ComponentsConcreteMediator
+{
+    private string $component1;
+
+    /**
+     * @return string
+     */
+    public function getComponent1(): string
     {
-        $this->infoBase->printInfo($this->worker);
+        return $this->component1;
     }
-}
 
-class Developer extends Worker
+    /**
+     * @param string $component1
+     */
+    public function __construct(string $component1)
+    {
+        $this->component1 = $component1;
+    }
+
+}
+class ComponentTwo extends ComponentsConcreteMediator
 {
+    private string $component2;
+
+    /**
+     * @return string
+     */
+    public function getComponent2(): string
+    {
+        return $this->component2;
+    }
+
+    /**
+     * @param string $component2
+     */
+    public function __construct(string $component2)
+    {
+        $this->component2 = $component2;
+    }
 
 }
 
-class Designer extends Worker
-{
+$component1 = new ComponentOne("Component 1");
+$component2 = new ComponentTwo("Component 2");
+$concreteComponents = new ConcreteComponents();
 
-}
-
-
-$developer = new Developer("Developer");
-$designer = new Developer("Designer");
-$infoBase = new InfoBase();
-$workerInfoBaseMediator = new WorkerInfoBaseMediator($designer, $infoBase);
-
-$workerInfoBaseMediator->getWorker();
+$components = new ComponentsConcreteMediator($component1, $component2, $concreteComponents);
+$components->getComponents();
