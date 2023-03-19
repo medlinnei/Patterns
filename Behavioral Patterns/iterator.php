@@ -13,98 +13,58 @@
  * При этом код становится более читабельным и легко поддерживаемым,
  * так как не нужно каждый раз повторять один и тот же код для доступа к элементам коллекции.
  */
-class WorkerList
+<?php
+class MeIterator implements Iterator
 {
-    private array $list = [];
-    private int $index = 0;
-
-    /**
-     * @return int
-     */
-    public function getIndex(): int
-    {
-        return $this->index;
-    }
-
-    /**
-     * @param int $index
-     */
-    public function setIndex(int $index): void
-    {
-        $this->index = $index;
-    }
-
+    public $iterator;
+    public array $name = [];
 
     /**
      * @return array
      */
-    public function getList(): array
+    public function getName(): array
     {
-        return $this->list;
+        return $this->name;
     }
 
     /**
-     * @param array $list
+     * @param array $name
      */
-    public function setList(array $list): void
-    {
-        $this->list = $list;
-    }
-
-    public function getItem($key): ?Worker
-    {
-        if($this->list[$key])
-        {
-            return $key;
-        }
-        return null;
-    }
-
-    public function next()
-    {
-        if($this->index < count($this->list) - 1) {
-            $this->index++;
-        }
-    }
-
-    public function prev()
-    {
-        $this->index--;
-    }
-
-    public function getByIndex(): Worker
-    {
-        return $this->list[$this->index];
-    }
-}
-
-class Worker
-{
-    private string $name = "";
-
-    /**
-     * @param string $name
-     */
-    public function __construct(string $name)
+    public function setName(array $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
-    public function getName(): string
+    public function current(): mixed
     {
-        return $this->name;
+        return $this->name[$this->iterator];
+    }
+
+    public function next(): void
+    {
+        ++$this->iterator;
+    }
+
+    public function key(): mixed
+    {
+        return $this->iterator;
+    }
+
+    public function valid(): bool
+    {
+        return isset($this->name[$this->iterator]);
+    }
+
+    public function rewind(): void
+    {
+        $this->iterator = 0;
     }
 }
 
-$worker = new Worker("Ivan");
-$workerTwo = new Worker("Alex");
-$workerThree = new Worker("Kate");
+$name = ["Alex", "Ivan", "Kate"];
+$it = new MeIterator();
+$it->setName($name);
 
-$workerList = new WorkerList();
-$workerList->setList([$worker, $workerTwo, $workerThree]);
-$workerList->next();
-
-var_dump($workerList->getByIndex()->getName());
+foreach($it as $iterator => $name) {
+    echo "$iterator: $name". PHP_EOL;
+}
