@@ -11,50 +11,62 @@
  * что позволяет удобно управлять выполнением операций.
  */
 
-interface Command
-{
-    public function exeute();
+<?php
+
+interface Command {
+    public function execute();
 }
 
-interface Undoable extends Command
+class BinaryCode
 {
-    public function undo();
+    public function zero()
+    {
+        echo "0";
+    }
+    public function one()
+    {
+        echo "1";
+    }
 }
 
-class Output
+class ComandOne implements Command
 {
-    private bool $isEnable = true;
-    private string $body = "";
+    private BinaryCode $binaryCode;
 
     /**
-     * @return string
+     * @param BinaryCode $binaryCode
      */
-    public function getBody(): string
+    public function __construct(BinaryCode $binaryCode)
     {
-        return $this->body;
+        $this->binaryCode = $binaryCode;
     }
 
-    public function write($str)
+    public function execute()
     {
-        if($this->isEnable){
-            $this->body = $str;
-        }
+        $this->binaryCode->one();
+    }
+}
+class CommandZero
+{
+    private BinaryCode $binaryCode;
+
+    /**
+     * @param BinaryCode $binaryCode
+     */
+    public function __construct(BinaryCode $binaryCode)
+    {
+        $this->binaryCode = $binaryCode;
     }
 
-    public function enable()
+    public function execute()
     {
-        $this->isEnable = true;
-    }
-
-    public function disable()
-    {
-        $this->isEnable = false;
+        $this->binaryCode->zero();
     }
 }
 
-class Invoker
+class Remote
 {
-    private Command $command;
+    public Command $command;
 
     /**
      * @param Command $command
@@ -63,59 +75,13 @@ class Invoker
     {
         $this->command = $command;
     }
-    public function run()
+    public function execute()
     {
-        $this->command->exeute();
+        $this->command->execute();
     }
 }
 
-class Message implements Command
-{
-    private Output $output;
-
-    /**
-     * @param Output $output
-     */
-    public function __construct(Output $output)
-    {
-        $this->output = $output;
-    }
-
-    public function exeute()
-    {
-        $this->output->write("some string from execute");
-    }
-}
-
-class ChangerStatus implements Undoable
-{
-    private Output $output;
-
-    /**
-     * @param Output $output
-     */
-    public function __construct(Output $output)
-    {
-        $this->output = $output;
-    }
-
-    public function exeute()
-    {
-        $this->output->enable();
-    }
-
-    public function undo()
-    {
-        $this->output->disable();
-    }
-}
-
-$output = new Output();
-$invoker = new Invoker();
-$messege = new Message($output);
-
-$undoable = new ChangerStatus($output);
-$undoable->undo();
-
-$messege->exeute();
-var_dump($output->getBody());
+$binaryCode = new BinaryCode();
+$remote = new Remote();
+$commandone = new ComandOne($binaryCode);
+$commandone->execute();
