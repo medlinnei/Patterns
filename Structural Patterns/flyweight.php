@@ -11,67 +11,44 @@
  * которые имеют одинаковые свойства. Таким образом, мы избегаем создания лишних объектов,
  * что уменьшает потребление памяти и ускоряет выполнение программы.
  */
-interface Mail
+<?php
+
+interface FlyInterface
 {
-    public function render(): string;
+    public function operation();
 }
 
-abstract class TypeMail
+class Fly
 {
-    private string $text;
-
-    /**
-     * @param string $text
-     */
-    public function __construct(string $text)
+    protected $element = [];
+    public function setElement(array $element): void
     {
-        $this->text = $text;
+        $this->element = $element;
     }
-    public function getText()
+    public function getElement($key)
     {
-        return $this->text;
-    }
-}
-
-class BusinessMail extends TypeMail implements Mail
-{
-    public function render(): string
-    {
-        return $this->getText() . "from business mail";
-    }
-
-}
-
-class JobMail extends TypeMail implements Mail
-{
-    public function render(): string
-    {
-        return $this->getText() . "from job mail";
-    }
-
-}
-
-class MailFactory
-{
-    private array $pool = [];
-
-    public function getMail($id, $typeMail): Mail
-    {
-        if(!isset($this->pool[$id])){
-            $this->pool[$id] = $this->make($typeMail);
+        if(!isset($this->element[$key])){
+            $this->element[$key] = new ConcreteElement($key);
         }
-        return $this->pool[$id];
+        return $this->element[$key];
     }
 
-    private function make($typeMail): Mail
-    {
-        if($typeMail === "business"){
-            return new BusinessMail("Business text ");
-        }
-        return new JobMail("Job text ");
-    }
 }
 
-$mailFactory = new MailFactory();
-$mail = $mailFactory->getMail(10, "business");
-var_dump($mail->render());
+class ConcreteElement implements FlyInterface
+{
+    private $key;
+    public function __construct($key)
+    {
+        $this->key = $key;
+    }
+
+    public function operation()
+    {
+        echo "element". $this->key;
+    }
+}
+$fly = new Fly();
+$fly->setElement([1]);
+$concreteElement = new ConcreteElement(1);
+$concreteElement->operation();
