@@ -12,40 +12,34 @@
  * чтобы напрямую получать доступ к этому объекту, мы создаем прокси-объект,
  * который делает то же самое, что и наш объект, но дополнительно выполняет дополнительную логику.
  */
-interface Worker
-{
-    public function slosedHours($hours);
+<?php
 
-    public function countSalary(): int;
+interface Square
+{
+    public function square();
 }
 
-class WorkOutSourceTime implements Worker
+class Tusk implements Square
 {
-    private array $hours = [];
-    public function slosedHours($hours)
+    public function square()
     {
-        $this->hours[] = $hours;
-    }
-    public function countSalary(): int
-    {
-        return array_sum($this->hours) * 100;
+       echo "Оригінальний об'єкт виконує роботу";
     }
 }
 
-class WorkerProxy extends WorkOutSourceTime implements Worker
+class Proxy implements Square
 {
-    private int $selery = 0;
-
-    public function countSalary(): int
+    public function square()
     {
-        if($this->selery === 0){
-            $this->selery = parent::countSalary();
-        }
-        return $this->selery;
+        echo "Проксі виконує проксі" . PHP_EOL;
+    }
+
+    public function __construct(Tusk $tusk)
+    {
+        $tusk->square();
     }
 }
 
-$workerProxy = new WorkerProxy();
-$workerProxy->slosedHours(10);
-
-var_dump($workerProxy->countSalary());
+$tusk = new Tusk();
+$proxy = new Proxy($tusk);
+$proxy->square();
