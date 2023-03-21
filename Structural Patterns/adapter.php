@@ -6,55 +6,50 @@
  * который не был разработан для совместного использования.
  */
 
-interface NativeWorker
+interface WorkerNative
 {
     public function countSalary(): int;
 }
-
-interface OutsourceWorker
+interface OutserceWorker
 {
-    public function countSalaryByHour($hours): int;
+    public function countSalaryHours($hours): int;
 }
 
-class NativeDeveloper implements NativeWorker
+class DeveloperNative implements WorkerNative
 {
 
     public function countSalary(): int
     {
-        return 3000 * 20;
+        return 1000 * 15;
     }
 }
-class OutsourceDeveloper implements OutsourceWorker
+class DeveloperOutserce implements OutserceWorker
 {
+    public function countSalaryHours($hours): int
+    {
+        return $hours;
+    }
+}
 
-    public function countSalaryByHour($hours): int
+class AdapterDeveloperNative implements OutserceWorker
+{
+    protected WorkerNative $workerNative;
+
+    /**
+     * @param WorkerNative $workerNative
+     */
+    public function __construct(WorkerNative $workerNative)
+    {
+        $this->workerNative = $workerNative;
+    }
+
+    public function countSalaryHours($hours): int
     {
         return $hours * 100;
     }
 }
 
-class OutsourceWorkerAdapter implements NativeWorker
-{
-    private OutsourceWorker $outsourceWorker;
-
-    /**
-     * @param OutsourceWorker $outsourceWorker
-     */
-    public function __construct(OutsourceWorker $outsourceWorker)
-    {
-        $this->outsourceWorker = $outsourceWorker;
-    }
-
-    public function countSalary(): int
-    {
-        return $this->outsourceWorker->countSalaryByHour(80);
-    }
-}
-
-$nativeDeveloper = new NativeDeveloper();
-$outsourceDeveloper = new OutsourceDeveloper();
-
-$outsourceWorkerAdapter = new OutsourceWorkerAdapter($outsourceDeveloper);
-
-var_dump($outsourceWorkerAdapter->countSalary());
-
+$developerNative = new DeveloperNative();
+$outserceWorker = new DeveloperOutserce();
+$adapter = new AdapterDeveloperNative($developerNative);
+echo $adapter->countSalaryHours(6);
