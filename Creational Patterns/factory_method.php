@@ -10,53 +10,60 @@
  * Такой подход позволяет легко добавлять новые типы объектов, не изменяя существующий код,
  * что делает приложение более гибким и расширяемым.
  */
-interface Worker
+
+interface Product
 {
-    public function work();
+    public function NameProduct(): string;
 }
 
-class Developer implements Worker
+class ProductA implements Product
 {
 
-    public function work()
+    public function NameProduct(): string
     {
-        print_r("Developer");
+        return "Product A";
+    }
+}
+class ProductB implements Product
+{
+
+    public function NameProduct(): string
+    {
+        return "Product B";
     }
 }
 
-class Designer implements Worker
+abstract class Create
+{
+    abstract public function createProduct(): Product;
+
+    public function doSomething(): string
+    {
+        $product = $this->createProduct();
+        return "I'm working with " . $product->NameProduct();
+    }
+
+}
+
+class RealesProductA extends Create
 {
 
-    public function work()
+    public function createProduct(): Product
     {
-        print_r("Designer");
+        return new ProductA();
     }
 }
 
-interface WorkerFactory
+class RealesProductB extends Create
 {
-    public static function make();
-}
-
-class DesignerFactory implements WorkerFactory
-{
-    public static function make()
+    public function createProduct(): Product
     {
-        return new Designer();
+        return new ProductB();
     }
 }
 
-class DeveloperFactory implements WorkerFactory
-{
+$realesA = new RealesProductA();
+echo $realesA->doSomething(). PHP_EOL;
 
-    public static function make()
-    {
-        return new Developer();
-    }
-}
-
-$developer = DeveloperFactory::make();
-$designer = DesignerFactory::make();
-
-$developer->work();
-
+$realesB = new RealesProductB();
+echo $realesB->doSomething(). PHP_EOL;
