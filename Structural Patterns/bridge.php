@@ -12,68 +12,56 @@
  * Классы из этих иерархий связываются между собой мостом (bridge),
  * что позволяет изменять одну иерархию, не затрагивая другую
  */
-interface Formatter
+
+abstract class Student
 {
-    public function format($str): string;
-}
-
-class SimpleText implements Formatter
-{
-
-    public function format($str): string
-    {
-        return $str;
-    }
-}
-
-class HTMLText implements Formatter
-{
-
-    public function format($str): string
-    {
-        return "<p>$str</p>";
-    }
-}
-
-abstract class BridgeService
-{
-    public Formatter $formatter;
-
+    protected $collage;
     /**
-     * @param Formatter $formatter
+     * @param $collage
      */
-    public function __construct(Formatter $formatter)
+    public function __construct($collage)
     {
-        $this->formatter = $formatter;
+        $this->collage = $collage;
     }
-
-    abstract public function getFormatter($str): string;
+   abstract public function collage();
 }
-
-class SimpleTextService extends BridgeService
+class StudentUKD extends Student
+{
+    public function collage()
+    {
+        echo "Student ";
+        $this->collage->collage();
+    }
+}
+class StudentPNU extends Student
 {
 
-    public function getFormatter($str): string
+    public function collage()
     {
-       return $this->formatter->format($str);
+        echo "Student ";
+        $this->collage->collage();
     }
 }
-
-class HTMLTextService extends BridgeService
+interface Collage
 {
-
-    public function getFormatter($str): string
-    {
-        return $this->formatter->format($str);
-    }
+    public function collage();
 }
 
-$simpleText = new SimpleText();
-$htmlText = new HTMLText();
-
-$simpleTextService = new SimpleTextService($simpleText);
-$htmlTextService = new HTMLTextService($htmlText);
-
-var_dump($simpleTextService->getFormatter("Hello"));
-var_dump($htmlTextService->getFormatter("Hello"));
-
+class CollageUKD implements Collage
+{
+    public function collage()
+    {
+        echo "CollageUKD" . PHP_EOL;
+    }
+}
+class CollagePNU implements Collage
+{
+    public function collage()
+    {
+        echo "CollagePNU" . PHP_EOL;
+    }
+}
+$pnu = new StudentPNU(new CollagePNU());
+$pnu->collage();
+$ukd = new StudentUKD(new CollageUKD());
+$ukd->collage();
