@@ -13,76 +13,69 @@
  * так и другие группы объектов. Затем мы можем работать с этой структурой
  * как с одним объектом, вызывая методы узлов или групп узлов.
  */
-interface Renderable
+interface Device
 {
-    public function render(): string;
+    public function device();
 }
 
-class Mail implements Renderable
+class User implements Device
 {
-    private array $parts = [];
-    public function render(): string
+    private string $name;
+    private array $devices;
+
+    /**
+     * @param string $name
+     */
+    public function __construct(string $name)
     {
-        $result = " ";
-        foreach ($this->parts as $part){
-            $result .= $part->render();
+        $this->name = $name;
+        $this->devices = [];
+    }
+
+    public function addDevice(Device $device)
+    {
+        $this->devices[] = $device;
+    }
+
+    public function device()
+    {
+        foreach ($this->devices as $device) {
+            $output .= "- " . $device->device() . "\n";
         }
-        return $result;
-    }
-
-    public function addPart(Renderable $part)
-    {
-        $this->parts[] = $part;
+        return $output;
     }
 }
 
-abstract class Part
+class UserDevice implements Device
 {
-    private string $text;
+    private string $deviceUser;
 
     /**
-     * @return string
+     * @param string $deviceUser
      */
-    public function getText(): string
+    public function __construct(string $deviceUser)
     {
-        return $this->text . PHP_EOL;
+        $this->deviceUser = $deviceUser;
     }
 
-    /**
-     * @param string $text
-     */
-    public function __construct(string $text)
+    public function device()
     {
-        $this->text = $text;
+        return $this->deviceUser;
     }
 }
 
-class Headers extends Part implements Renderable
-{
-    public function render(): string
-    {
-        return $this->getText();
-    }
-}
-class Body extends Part implements Renderable
-{
-    public function render(): string
-    {
-        return $this->getText();
-    }
-}
-class Footer extends Part implements Renderable
-{
-    public function render(): string
-    {
-        return $this->getText();
-    }
-}
+// Создаем объект пользователя
+$user = new User("Ivan");
 
-$mail = new Mail();
+// Создаем объекты устройств
+$phone = new UserDevice("Phone");
+$laptop = new UserDevice("Laptop");
+$smartwatch = new UserDevice("Smartwatch");
 
-$mail->addPart(new Headers("Header"));
-$mail->addPart(new Body("Body"));
-$mail->addPart(new Footer("Footer"));
+// Добавляем устройства к пользователю
+$user->addDevice($phone);
+$user->addDevice($laptop);
+$user->addDevice($smartwatch);
 
-var_dump($mail->render());
+// Выводим информацию о пользователе и его устройствах
+echo $user->device();
